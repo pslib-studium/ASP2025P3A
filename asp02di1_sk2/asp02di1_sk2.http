@@ -1,0 +1,6 @@
+@asp02di1_sk2_HostAddress = http://localhost:5094
+
+GET {{asp02di1_sk2_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
