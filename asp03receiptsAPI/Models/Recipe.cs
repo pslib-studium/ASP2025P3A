@@ -1,4 +1,6 @@
-﻿namespace asp03receiptsAPI.Models
+﻿using System.Text.Json.Serialization;
+
+namespace asp03receiptsAPI.Models
 {
     public class Recipe
     {

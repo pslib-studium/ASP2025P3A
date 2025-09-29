@@ -15,17 +15,25 @@ namespace asp03receiptsAPI.Controllers
     public class IngredientsController : ControllerBase
     {
         private readonly RecipesDbContext _context;
+        private readonly ILogger<IngredientsController> _logger;
 
-        public IngredientsController(RecipesDbContext context)
+        public IngredientsController(
+            RecipesDbContext context, 
+            ILogger<IngredientsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Ingredients
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Ingredient>>> GetIngredients()
         {
-            return await _context.Ingredients.ToListAsync();
+            _logger.LogInformation("Getting all ingredients");
+            IQueryable<Ingredient> query = _context.Ingredients;
+            List<Ingredient> ingredients = await query.ToListAsync();
+            _logger.LogDebug(ingredients.ToString());
+            return Ok(ingredients);
         }
 
         // GET: api/Ingredients/5

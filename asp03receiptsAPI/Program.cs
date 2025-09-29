@@ -1,5 +1,6 @@
 using asp03receiptsAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference(); // https://localhost:7205/scalar
 }
 
 app.UseHttpsRedirection();
