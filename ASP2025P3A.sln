@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "asp01api", "asp01api\asp01a
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "asp02di1_sk2", "asp02di1_sk2\asp02di1_sk2.csproj", "{601475D7-2FBE-48A6-8645-6987C6B4D980}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "asp03receiptsAPI", "asp03receiptsAPI\asp03receiptsAPI.csproj", "{C526AE87-F09E-42AD-8401-D679C9C21941}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{601475D7-2FBE-48A6-8645-6987C6B4D980}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{601475D7-2FBE-48A6-8645-6987C6B4D980}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{601475D7-2FBE-48A6-8645-6987C6B4D980}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C526AE87-F09E-42AD-8401-D679C9C21941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C526AE87-F09E-42AD-8401-D679C9C21941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C526AE87-F09E-42AD-8401-D679C9C21941}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C526AE87-F09E-42AD-8401-D679C9C21941}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

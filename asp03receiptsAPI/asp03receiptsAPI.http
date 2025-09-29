@@ -1,0 +1,6 @@
+@asp03receiptsAPI_HostAddress = http://localhost:5231
+
+GET {{asp03receiptsAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
