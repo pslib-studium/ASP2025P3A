@@ -103,23 +103,28 @@ namespace asp03receiptsAPI.Controllers
         }
 
         [HttpGet("{id}/ingredinces")]
-        public async Task<ActionResult<IEnumerable<Ingredient>>> GetRecipeIngredients(int id)
+        public async Task<ActionResult<IEnumerable<RecipeIngredientDto>>> GetRecipeIngredients(int id)
         {
-            if (_context == null)
-            {
-                return BadRequest("context is null");
-            }
-            var recipe = await _context.Recipes
-                .Include(x => x.Content)
-                .ThenInclude(x => x.Ingredient)
-                .Where(x => x.RecipeId == id)
-                .Select(x => x.Content.Select(ri => ri.Ingredient))
-                .FirstOrDefaultAsync();
+            var recipe = await _context.Recipes.FirstOrDefaultAsync(x => x.RecipeId == id);
             if (recipe == null)
             {
                 return NotFound("recipe not found");
             }
-            return Ok(recipe);
+            _logger.LogInformation("Recipe {id} found", id);
+            await _context.Entry(recipe)
+                .Collection(r => r.Content!)
+                .Query()
+                .Include(ri => ri.Ingredient)
+                .LoadAsync();
+            var result = recipe.Content!
+                .Select(ri => new RecipeIngredientDto(
+                    ri.RecipeId,
+                    ri.IngredientId,
+                    ri.Ingredient.Name,
+                    ri.Quantity,
+                    ri.Unit))
+                .ToList();
+            return Ok(result);
         }
 
         //[HttpPost("{id}/ingrediences/{ingredientId}")]
@@ -156,6 +161,31 @@ namespace asp03receiptsAPI.Controllers
             return CreatedAtAction("GetRecipeIngredients", new { id = recipeIngredient.RecipeId }, recipeIngredient);
         }
 
+        [HttpDelete("{id}/ingrediences")]
+        public async Task<IActionResult> 
+            RemoveIngredientFromRecipe(int id, [FromBody] int ingredientId)
+        {
+            var recipe = await _context.Recipes.FindAsync(id);
+            if (recipe == null)
+            {
+                return NotFound("recipe not found");
+            }
+            var ingredient = await _context.Ingredients.FindAsync(ingredientId);
+            if (ingredient == null)
+            {
+                return NotFound("ingredient not found");
+            }
+            var ingredientInRecipe = await _context.Set<RecipeIngredient>()
+                .FindAsync(id, ingredientId);
+            if (ingredientInRecipe == null)
+            {
+                return NotFound("ingredient not in recipe");
+            }
+            _context.Set<RecipeIngredient>().Remove(ingredientInRecipe);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
         private bool RecipeExists(int id)
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
@@ -165,5 +195,11 @@ namespace asp03receiptsAPI.Controllers
     public record AddIngredientToRecipeDto(
         int IngredientId, 
         int Quantity, 
+        string Unit);
+    public record RecipeIngredientDto(
+        int RecipeId,
+        int IngredientId,
+        string IngredientName,
+        int Quantity,
         string Unit);
 }
