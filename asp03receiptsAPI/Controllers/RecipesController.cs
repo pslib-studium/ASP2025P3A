@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using asp03receiptsAPI.Data;
 using asp03receiptsAPI.Models;
+using asp03receiptsAPI.Services.Options;
+using Microsoft.Extensions.Options;
+using asp03receiptsAPI.DTOs;
 
 namespace asp03receiptsAPI.Controllers
 {
@@ -16,18 +19,63 @@ namespace asp03receiptsAPI.Controllers
     {
         private readonly RecipesDbContext _context;
         private readonly ILogger<RecipesController> _logger;
+        private readonly PaginationOptions _paginationOptions;
 
-        public RecipesController(RecipesDbContext context, ILogger<RecipesController> logger)
+        public RecipesController(
+            RecipesDbContext context, 
+            ILogger<RecipesController> logger,
+            IOptions<PaginationOptions> options
+            )
         {
             _context = context;
             _logger = logger;
+            _paginationOptions = options.Value;
         }
 
         // GET: api/Recipes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Recipe>>> GetRecipes()
+        public async Task<ActionResult<ListItems<Recipe>>> GetRecipes(
+            string? search,
+            string? title,
+            int? page,
+            int? size,
+            SortedBy order = SortedBy.Id
+            )
         {
-            return await _context.Recipes.ToListAsync();
+            IQueryable<Recipe> query = _context.Recipes;
+            // filter
+            if (!String.IsNullOrEmpty(search))
+            {
+                query = query.Where(r => r.Title.StartsWith(search, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!String.IsNullOrEmpty(title))
+            {
+                //query = query.Where(r => r.Title.Contains(title));
+                query = query.Where(r => r.Title.ToLower().Contains(title.ToLower()));
+            }
+            // ordering
+            query = order switch
+            {
+                SortedBy.Title => query.OrderBy(r => r.Title),
+                SortedBy.Title_Desc => query.OrderByDescending(r => r.Title),
+                SortedBy.Id_Desc => query.OrderByDescending(r => r.RecipeId),
+                _ => query.OrderBy(r => r.RecipeId),
+            };
+            // pagination
+            int total = query.Count();
+            if (!page.HasValue) page = 1;
+            query = query.Skip((page.Value - 1) * (size ?? _paginationOptions.DefaultPageSize));
+            if (size.HasValue)
+            {
+                query = query.Take(size.Value);
+            }
+            return new ListItems<Recipe>
+            {
+                TotalCount = total,
+                Items = await query.ToListAsync(),
+                Page = page.Value,
+                Size = size
+            };
         }
 
         // GET: api/Recipes/5
@@ -129,7 +177,7 @@ namespace asp03receiptsAPI.Controllers
 
         //[HttpPost("{id}/ingrediences/{ingredientId}")]
         [HttpPost("{id}/ingrediences")]
-        public async Task<ActionResult<RecipeIngredient>> 
+        public async Task<ActionResult<RecipeIngredient>>
             AddIngredientToRecipe(int id, [FromBody] AddIngredientToRecipeDto ing)
         {
             var recipe = await _context.Recipes.FindAsync(id);
@@ -162,7 +210,7 @@ namespace asp03receiptsAPI.Controllers
         }
 
         [HttpDelete("{id}/ingrediences")]
-        public async Task<IActionResult> 
+        public async Task<IActionResult>
             RemoveIngredientFromRecipe(int id, [FromBody] int ingredientId)
         {
             var recipe = await _context.Recipes.FindAsync(id);
@@ -193,8 +241,8 @@ namespace asp03receiptsAPI.Controllers
     }
 
     public record AddIngredientToRecipeDto(
-        int IngredientId, 
-        int Quantity, 
+        int IngredientId,
+        int Quantity,
         string Unit);
     public record RecipeIngredientDto(
         int RecipeId,
@@ -202,4 +250,12 @@ namespace asp03receiptsAPI.Controllers
         string IngredientName,
         int Quantity,
         string Unit);
+
+    public enum SortedBy
+    {
+        Id,
+        Id_Desc,
+        Title,
+        Title_Desc,    
+    }
 }
