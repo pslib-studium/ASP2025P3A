@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using asp03receiptsAPI.Data;
 
@@ -11,9 +12,11 @@ using asp03receiptsAPI.Data;
 namespace asp03receiptsAPI.Migrations
 {
     [DbContext(typeof(RecipesDbContext))]
-    partial class RecipesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251020114635_RecipeDetails3")]
+    partial class RecipeDetails3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,7 +75,7 @@ namespace asp03receiptsAPI.Migrations
                         new
                         {
                             RecipeId = 1,
-                            CreatedAt = new DateTime(2025, 10, 20, 13, 43, 26, 949, DateTimeKind.Local),
+                            CreatedAt = new DateTime(2025, 10, 20, 13, 46, 34, 857, DateTimeKind.Local).AddTicks(5106),
                             Description = "Jednoduchý recept na míchaná vajíčka.",
                             Title = "Míchaná vajíčka"
                         });

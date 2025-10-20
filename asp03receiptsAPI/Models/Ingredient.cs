@@ -6,6 +6,7 @@ namespace asp03receiptsAPI.Models
     {
         public int IngredientId { get; set; }
         public required string Name { get; set; }
+
         [JsonIgnore]
         public ICollection<RecipeIngredient>? Content { get; set; }
     }

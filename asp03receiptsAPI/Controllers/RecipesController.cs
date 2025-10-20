@@ -95,13 +95,13 @@ namespace asp03receiptsAPI.Controllers
         // PUT: api/Recipes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRecipe(int id, Recipe recipe)
+        public async Task<IActionResult> PutRecipe(int id, EditRecipeDTO input)
         {
-            if (id != recipe.RecipeId)
+            if (id != input.RecipeId)
             {
-                return BadRequest();
+                return BadRequest("ID of parameter and data does not match");
             }
-
+            /*
             _context.Entry(recipe).State = EntityState.Modified;
 
             try
@@ -119,6 +119,34 @@ namespace asp03receiptsAPI.Controllers
                     throw;
                 }
             }
+            */
+            var recipe = await _context.Recipes.FindAsync(id);
+            if (recipe == null)
+            {
+                return NotFound();
+            }
+            recipe.Title = input.Title;
+            recipe.Description = input.Description;
+            try 
+            {                 
+                await  _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!RecipeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating recipe {id}", id);
+                throw; // 500
+            }
 
             return NoContent();
         }
@@ -126,12 +154,23 @@ namespace asp03receiptsAPI.Controllers
         // POST: api/Recipes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Recipe>> PostRecipe(Recipe recipe)
+        public async Task<ActionResult<Recipe>> PostRecipe([FromBody] CreateRecipeDTO input)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var recipe = new Recipe
+            {
+                Title = input.Title,
+                Description = input.Description,
+                CreatedAt = DateTime.Now
+            };
             _context.Recipes.Add(recipe);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetRecipe", new { id = recipe.RecipeId }, recipe);
+            //return StatusCode(StatusCodes.Status201Created);
         }
 
         // DELETE: api/Recipes/5
@@ -244,6 +283,7 @@ namespace asp03receiptsAPI.Controllers
         int IngredientId,
         int Quantity,
         string Unit);
+
     public record RecipeIngredientDto(
         int RecipeId,
         int IngredientId,
@@ -258,4 +298,15 @@ namespace asp03receiptsAPI.Controllers
         Title,
         Title_Desc,    
     }
+
+    public record CreateRecipeDTO(
+        string Title,
+        string? Description
+    );
+
+    public record EditRecipeDTO(
+        int RecipeId,
+        string Title,
+        string? Description
+    );
 }

@@ -10,6 +10,7 @@ namespace asp03receiptsAPI.Data
         public DbSet<Ingredient> Ingredients { get; set; }
         public RecipesDbContext(DbContextOptions options) : base(options)
         {
+            
         }
 
         protected RecipesDbContext()
@@ -26,7 +27,9 @@ namespace asp03receiptsAPI.Data
             Recipe michanaVajicka = new()
             {
                 RecipeId = michanaVajickaId,
-                Title = "Míchaná vajíčka"
+                Title = "Míchaná vajíčka",
+                Description = "Jednoduchý recept na míchaná vajíčka.",
+                CreatedAt = new DateTime(2025, 10, 20, 13, 43, 26, 949, DateTimeKind.Local)
             };
             Ingredient vajicko = new()
             {

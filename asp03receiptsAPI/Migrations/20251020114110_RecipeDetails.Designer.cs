@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using asp03receiptsAPI.Data;
 
@@ -11,9 +12,11 @@ using asp03receiptsAPI.Data;
 namespace asp03receiptsAPI.Migrations
 {
     [DbContext(typeof(RecipesDbContext))]
-    partial class RecipesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251020114110_RecipeDetails")]
+    partial class RecipeDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,7 +57,7 @@ namespace asp03receiptsAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecipeId"));
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -72,8 +75,7 @@ namespace asp03receiptsAPI.Migrations
                         new
                         {
                             RecipeId = 1,
-                            CreatedAt = new DateTime(2025, 10, 20, 13, 43, 26, 949, DateTimeKind.Local),
-                            Description = "Jednoduchý recept na míchaná vajíčka.",
+                            CreatedAt = new DateTime(2025, 10, 20, 11, 41, 9, 343, DateTimeKind.Utc).AddTicks(7998),
                             Title = "Míchaná vajíčka"
                         });
                 });
